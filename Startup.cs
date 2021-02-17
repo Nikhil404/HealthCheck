@@ -65,7 +65,7 @@ namespace HealthCheck
             {
                 app.UseSpaStaticFiles();
             }
-            app.UseHealthChecks("/hc");
+            app.UseHealthChecks("/hc", new CustomHealthCheckOptions());
 
             app.UseRouting();
 
