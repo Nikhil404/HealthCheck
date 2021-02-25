@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace HealthCheck
 {
@@ -48,8 +49,11 @@ namespace HealthCheck
             }
 
             app.UseHttpsRedirection();
+            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+            provider.Mappings[".webmanifest"] = "application/manifest+json";
             app.UseStaticFiles(new StaticFileOptions()
             {
+                ContentTypeProvider = provider,
                 OnPrepareResponse = (context) =>
                 {
                     // Disable caching for all static files. 
@@ -63,7 +67,10 @@ namespace HealthCheck
             });
             if (!env.IsDevelopment())
             {
-                app.UseSpaStaticFiles();
+                app.UseSpaStaticFiles(new StaticFileOptions()
+                {
+                    ContentTypeProvider = provider
+                });
             }
             app.UseHealthChecks("/hc", new CustomHealthCheckOptions());
 
