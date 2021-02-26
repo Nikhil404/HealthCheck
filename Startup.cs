@@ -49,22 +49,24 @@ namespace HealthCheck
             }
 
             app.UseHttpsRedirection();
+            // add .webmanifest MIME-type support
             FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
             provider.Mappings[".webmanifest"] = "application/manifest+json";
+
             app.UseStaticFiles(new StaticFileOptions()
             {
                 ContentTypeProvider = provider,
                 OnPrepareResponse = (context) =>
                 {
-                    // Disable caching for all static files. 
-                    context.Context.Response.Headers["Cache-Control"] =
-                        "no-cache, no-store";
-                    context.Context.Response.Headers["Pragma"] =
-                        "no-cache";
-                    context.Context.Response.Headers["Expires"] =
-                        "-1";
+                    if (context.File.Name == "isOnline.txt")
+                    {
+                        // disable caching for these files
+                        context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+                        context.Context.Response.Headers.Add("Expires", "-1");
+                    }
                 }
             });
+
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles(new StaticFileOptions()
